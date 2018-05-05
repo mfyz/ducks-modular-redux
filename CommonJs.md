@@ -1,4 +1,4 @@
-## Common JS Example
+## Common JS Ornegi
 
 ```javascript
 // widgets.js
@@ -35,16 +35,16 @@ module.exports = reducer;
 ```
 
 
-One of the different caveats is that you can't use Redux' `bindActionCreators()` directly with a duck module, as it assumes that when given a function, it's a single action creator, so you need to do something like:
+Duck paketlerinin icinde Redux'un `bindActionCreators()` methodunu dogrudan kullanamamizin ana nedeni, herhangi bir fonsiyon tanimlamasini, tek bir action creator olarak varsaymasi. Bundan dolayi soyle birsey yapmaniz gerekiyor:
 
 ```javascript
 var actionCreators = require('./ducks/widgets');
 bindActionCreators({ ...actionCreators });
 ```
 
-Another is that if you're also exporting some type constants, you need to attach those to the reducer function too, so you can't unpack just the action creators into another object at import time as easily (no `as` syntax) so the above trick isn't as viable.
+Baska bir negatif yan da, tur sabitlerini export ederken, buna iliskili reducer fonksiyonu da eklemeniz gerekiyor. Yani action creator'lari baska bir objeye tasiyamiyorsunuz kolayca.
 
-You can avoid getting bitten by both of these by rolling your own dispatch binding function - this is the one I'm using to create a function to be passed as the `mapDispatchToProps` argument to `connect()`:
+Bunlarin hepsinden kacmak kolay. Kendi dispatch binding fonksiyonunuzu yazmak - asagidaki ornek `mapDispatchToProps` olarak gonderdigimiz bir fonksiyonu uretip `connect()`e arguman olarak gonderiyor:
 
 ```javascript
 /**
@@ -71,4 +71,4 @@ module.exports = connect(mapStateToProps , mapDispatchToProps)(MyComponent);
 ```
 
 ---
-This document copied almost verbatim from [@insin](https://github.com/insin)'s issue [#2](https://github.com/erikras/ducks-modular-redux/issues/2).
+Bu dokuman [@insin](https://github.com/insin) tarafindan acilan github tartismasindan alintidir [#2](https://github.com/erikras/ducks-modular-redux/issues/2).
