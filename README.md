@@ -2,15 +2,15 @@
 
 <img src="duck.jpg" align="right"/>
 
-I find as I am building my redux app, one piece of functionality at a time, I keep needing to add  `{actionTypes, actions, reducer}` tuples for each use case. I have been keeping these in separate files and even separate folders, however 95% of the time, it's only one reducer/actions pair that ever needs their associated actions.
+Her redux uygulamasi gelistirdigimde, uygulamami parca parca yaziyorim. Bu surecte, kendimi surekli `{actionTypes, actions, reducer}` uclemesini yazarken buluyorum. Bunlari ayri dosyalarda hatta ayri klasorlerde tutuyordum. Ancak 95% oranda sadece tek reducer/action ikilisi bu iliskileri kullanmaya ihtiyac duyuyor.
 
-To me, it makes more sense for these pieces to be bundled together in an isolated module that is self contained, and can even be packaged easily into a library.
+Bence, bu parcalari tek dosyada toplu sekilde tutmak cok daha mantikli. Boylece izole sekilde, paketlenmis bir sekilde bir arada durabilirler.
 
-## The Proposal
+## Oneri
 
-### Example
+### Ornek
 
-See also: [Common JS Example](CommonJs.md).
+Bakiniz: [Common JS Example](CommonJs.md).
 
 ```javascript
 // widgets.js
@@ -24,7 +24,7 @@ const REMOVE = 'my-app/widgets/REMOVE';
 // Reducer
 export default function reducer(state = {}, action = {}) {
   switch (action.type) {
-    // do reducer stuff
+    // reducer ile ilgili seyler buraya gelecek
     default: return state;
   }
 }
@@ -53,24 +53,24 @@ export function getWidget () {
 }
 
 ```
-### Rules
+### Kurallar
 
-A module...
+Bir modul...
 
-1. MUST `export default` a function called `reducer()`
-2. MUST `export` its action creators as functions
-3. MUST have action types in the form `npm-module-or-app/reducer/ACTION_TYPE`
-3. MAY export its action types as `UPPER_SNAKE_CASE`, if an external reducer needs to listen for them, or if it is a published reusable library
+1. KESINLIKLE `reducer()` adinda bir fonksiyonu `export default` ile export etmeli
+2. KESINLIKLE aksiyon ureten tanimlari fonksiyon olarak `export` etmeli
+3. KESINLIKLE action tiplerini `npm-module-or-app/reducer/ACTION_TYPE` isimlendirme yapisiyla tanimlamali
+3. BELKI aksiyon turlerini `UPPER_SNAKE_CASE` seklindeki isimlendirme yapisiyka expor tedebilir, eger disaridan bir reducer dinlemek isterse, tekrardan kullanilabilir sekilde olurlar.
 
-These same guidelines are recommended for `{actionType, action, reducer}` bundles that are shared as reusable Redux libraries.
+Ayni kurallar `{actionType, action, reducer}` uclulueri icin de gecerli.
 
-### Name
+### Isimlendirme
 
-Java has jars and beans. Ruby has gems. I suggest we call these reducer bundles "ducks", as in the last syllable of "redux".
+Java, jars ve beans paketlerine sahip. Ruby'nin gem'leri var. Ben bu reducer paketlerine "ducks" (ordekler) adini vermek istiyorum. "redux" ise sesdes oluyorlar boylece.
 
-### Usage
+### Kullanimi
 
-You can still do:
+Hala sunu yapabilirsiniz:
 
 ```javascript
 import { combineReducers } from 'redux';
@@ -80,16 +80,16 @@ const rootReducer = combineReducers(reducers);
 export default rootReducer;
 ```
 
-You can still do:
+Bunu da:
 
 ```javascript
 import * as widgetActions from './ducks/widgets';
 ```
-...and it will only import the action creators, ready to be passed to `bindActionCreators()`.
+...boylece sadece action ureticilerini import etmis olursunuz, `bindActionCreators()` methodunda kullanima hazir olurlar.
 
-> Actually, it'll also import `default`, which will be the reducer function. It'll add an action creator named `default` that won't work. If that's a problem for you, you should enumerate each action creator when importing.
+> Aslinda, ayrica `default`'u import edecek, bu da reducer fonksiyonunuz olacak.
 
-There will be some times when you want to `export` something other than an action creator. That's okay, too. The rules don't say that you can *only* `export` action creators. When that happens, you'll just have to enumerate the action creators that you want. Not a big deal.
+Bazen action creator'lar disindaki seyleri export etmek isteyeceksiniz. Kodu bozmayacaktir. Sadece action creator'lari export etmekniz gerekir diye bir kural yok sonucta. 
 
 ```javascript
 import {loadWidgets, createWidget, updateWidget, removeWidget} from './ducks/widgets';
@@ -97,41 +97,42 @@ import {loadWidgets, createWidget, updateWidget, removeWidget} from './ducks/wid
 bindActionCreators({loadWidgets, createWidget, updateWidget, removeWidget}, dispatch);
 ```
 
-### Example
+### Ornek
 
-[React Redux Universal Hot Example](https://github.com/erikras/react-redux-universal-hot-example) uses ducks. See [`/src/redux/modules`](https://github.com/erikras/react-redux-universal-hot-example/tree/master/src/redux/modules).
+[React Redux Universal Hot Example](https://github.com/erikras/react-redux-universal-hot-example) projesi "ducks" kullaniyor. Bakiniz: [`/src/redux/modules`](https://github.com/erikras/react-redux-universal-hot-example/tree/master/src/redux/modules).
 
-[Todomvc using ducks.](https://github.com/goopscoop/ga-react-tutorial/tree/6-reduxActionsAndReducers)
+[Todomvc da ducks kullaniyor.](https://github.com/goopscoop/ga-react-tutorial/tree/6-reduxActionsAndReducers)
 
-### Implementation
+### Implementasyon
 
-The migration to this code structure was [painless](https://github.com/erikras/react-redux-universal-hot-example/commit/3fdf194683abb7c40f3cb7969fd1f8aa6a4f9c57), and I foresee it reducing much future development misery.
+Migrasyon aslinda oldukca [basit](https://github.com/erikras/react-redux-universal-hot-example/commit/3fdf194683abb7c40f3cb7969fd1f8aa6a4f9c57). Bence buyuk bas agrisindan kurtariyor gelistiricileri.
 
-Although it's completely feasable to implement it without any extra library, there are some tools that might help you:
+Herhangi bir kutuphane kullanmadan bu yaklasimi uygulamak mumkun. Ancak asagidaki implementasyonlar ve kutuphaneler araciligiyla isinizi kolaylastirabilirsiniz:
 
- * [extensible-duck](https://github.com/investtools/extensible-duck) - Implementation of the Ducks proposal. With this library you can create reusable and extensible ducks.
- * [saga-duck](https://github.com/cyrilluce/saga-duck) - Implementation of the Ducks proposal in Typescript with [sagas](https://github.com/redux-saga/redux-saga) in mind. Results in reusable and extensible ducks.
- * [redux-duck](https://github.com/PlatziDev/redux-duck) - Helper function to create Redux modules using the ducks-modular-redux proposal
- * [modular-redux-thunk](https://github.com/benbeadle/modular-redux-thunk) - A ducks-inspired package to help organize actions, reducers, and selectors together - with built-in redux-thunk support for async actions.
- * [molecular-js](https://www.npmjs.com/package/molecular-js) - Set of utilities to ease the development of modular state management patterns with Redux (also known as ducks).
- * [ducks-reducer](https://github.com/drpicox/ducks-reducer) - Function to combine _ducks object_ reducers into one reducer (equivalent to [combineReducers](https://redux.js.org/docs/api/combineReducers.html)), and function [ducks-middleware](https://github.com/drpicox/ducks-middleware) to combine _ducks object_ middleware into one single middleware compatible with [applyMiddleware](https://redux.js.org/docs/api/applyMiddleware.html).
+ * [extensible-duck](https://github.com/investtools/extensible-duck) - Ducks onerisinin uygulanmis hali. Bu kutuphane ile tekrardan kullanilabilir duck uretmek oldukca kolay.
+ * [saga-duck](https://github.com/cyrilluce/saga-duck) - Ducks onerisinin Typescript ile uygulanmis hali. Ayrica [saga](https://github.com/redux-saga/redux-saga)'lar da dusunulmus. Tekrar kullanilabilir duck uretmek icin baska bir kutuphane.
+ * [redux-duck](https://github.com/PlatziDev/redux-duck) - Redux modulleri ni ducks-modular-redux modeliyle uretmek icin yardimci bir sinif.
+ * [modular-redux-thunk](https://github.com/benbeadle/modular-redux-thunk) - action, reducer, ve selector'leri organize etmenize yarayacak ducks'dan esinlenilmis bir kutuphane. redux-thunk destegi de mevcut.
+ * [molecular-js](https://www.npmjs.com/package/molecular-js) - Ducks'a benzer, moduler paketler olusturmanizi saglayacak yardimci methodlardan olusan bir paket.
+ * [ducks-reducer](https://github.com/drpicox/ducks-reducer) - _ducks nesnelerini_ reducer'lara donusturen bir fonksiyon.([combineReducers](https://redux.js.org/docs/api/combineReducers.html)'a es deger), ve [ducks-middleware](https://github.com/drpicox/ducks-middleware) de _ducks nesnelerinden olusan_ middleware'leri tek bir middleware'e ceviren yardimci [applyMiddleware](https://redux.js.org/docs/api/applyMiddleware.html).
 
-Please submit any feedback via an issue or a tweet to [@erikras](https://twitter.com/erikras). It will be much appreciated.
+Herhangi bir geri bildirimi veya problemi ana repo'ya bildirebilirsiniz veya [@erikras](https://twitter.com/erikras)'a tweet atin. Cok tesekkur ederim.
 
-Happy coding!
+Mutlu Kodlamalar!
 
 -- Erik Rasmussen
 
 
-### Translation
+### Ceviriler
 
 [한국어](https://github.com/JisuPark/ducks-modular-redux)
 [中文](https://github.com/deadivan/ducks-modular-redux)
+[Turkce](https://github.com/mfyz/ducks-modular-redux-tr)
 
 ---
 
 ![C'mon! Let's migrate all our reducers!](migrate.jpg)
-> Photo credit to [Airwolfhound](https://www.flickr.com/photos/24874528@N04/3453886876/).
+> Foto kredisi [Airwolfhound](https://www.flickr.com/photos/24874528@N04/3453886876/).
 
 ---
 
