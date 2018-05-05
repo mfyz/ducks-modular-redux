@@ -10,7 +10,7 @@ Bence, bu parcalari tek dosyada toplu sekilde tutmak cok daha mantikli. Boylece 
 
 ### Ornek
 
-Bakiniz: [Common JS Example](CommonJs.md).
+Bakiniz: [Common JS Ornegi](CommonJs.md).
 
 ```javascript
 // widgets.js
