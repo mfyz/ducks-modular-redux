@@ -1,4 +1,4 @@
-# Ducks: Redux Reducer Bundles
+# Ducks: Redux Reducer Paketleri
 
 <img src="duck.jpg" align="right"/>
 
